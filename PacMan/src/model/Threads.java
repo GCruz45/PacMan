@@ -1,12 +1,12 @@
 package model;
 
-import controller.PacManCatcherController;
+import controller.PacManController;
 
 public class Threads extends Thread {
 
-    private PacManCatcherController controller;
+    private PacManController controller;
 
-    public Threads(PacManCatcherController controller) {
+    public Threads(PacManController controller) {
         this.controller = controller;
     }
     public void run(){

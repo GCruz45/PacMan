@@ -3,7 +3,6 @@ package model;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
-import javafx.scene.shape.Circle;
 
 import java.util.Random;
 
@@ -16,14 +15,12 @@ public class PacMan {
     private int yDirection;
     private double xOffset;
     private double yOffset;
-    private Circle fullArc;
     private Arc arc;
-    private Arc halfArc;
     private boolean animationStep = true;
     private double angleTransform;
     private boolean bounced = false;
 
-    public PacMan(int radius, boolean isActive, double speed, double xOffset, double yOffset) {
+    public PacMan(int radius, boolean isActive, double xOffset, double yOffset) {
         Random randomBoolean = new Random();
         int xDir;           // Si es 1, va hacia la derecha.
         int yDir;           // Si es 1, va hacia abajo.
@@ -60,17 +57,6 @@ public class PacMan {
         arc.setLength(270);
         arc.setStroke(Color.valueOf("BLACK"));
         arc.setStrokeWidth(3);
-    }
-
-    public PacMan(PacMan pacMan) {
-        this.radius = pacMan.getRadius();
-        this.isActive = pacMan.isActive();
-        this.speed = pacMan.getSpeed();
-        this.xDirection = pacMan.getxDirection();
-        this.yDirection = pacMan.getyDirection();
-
-        this.arc = pacMan.getArc();
-        this.animationStep = pacMan.isAnimationStep();
     }
 
     public void transformShape() {
@@ -184,28 +170,12 @@ public class PacMan {
         this.yOffset = yOffset;
     }
 
-    public Circle getFullArc() {
-        return fullArc;
-    }
-
-    public void setFullArc(Circle fullArc) {
-        this.fullArc = fullArc;
-    }
-
     public Arc getArc() {
         return arc;
     }
 
     public void setArc(Arc arc) {
         this.arc = arc;
-    }
-
-    public Arc getHalfArc() {
-        return halfArc;
-    }
-
-    public void setHalfArc(Arc halfArc) {
-        this.halfArc = halfArc;
     }
 
     public boolean isAnimationStep() {
