@@ -2,14 +2,17 @@ package controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import model.PacMan;
+import model.Score;
 import model.Threads;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class PacManController {
 
@@ -34,42 +37,154 @@ public class PacManController {
     private int bounces;
 
     @FXML
-    public void startGame() {
+    ChoiceBox levelCB;
 
+    @FXML
+    Label levelLabel;
+
+    @FXML
+    TextField playerTF;
+
+    @FXML
+    MenuItem topScores;
+
+    @FXML
+    void checkMouseClicks() {
+        if (levelCB.getValue() != null) {
+            startButton.setOpacity(1.0);
+            startButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    void getTopScores() {
+        Score score = new Score();
+        score.load();
+    }
+
+    @FXML
+    void catchPacMan(MouseEvent event) {
+        for (PacMan pacMan : pacManArray
+        ) {
+            double distance = Math.sqrt(Math.pow(pacMan.getxOffset() - event.getSceneX(), 2) +
+                    Math.pow(pacMan.getyOffset() - event.getSceneY(), 2));
+            if (distance < pacMan.getRadius()) {
+                pacMan.catchPacMan();
+            }
+        }
+        boolean gameFinished = true;
+        for (PacMan pacMan : pacManArray
+        ) {
+            if (pacMan.getSpeed() != 0) {
+                gameFinished = false;
+            }
+        }
+        if (gameFinished) {
+            Date date = new Date();
+            date.getTime();
+            Score score = new Score();
+
+            int level = -1;
+            switch (pacManArray.size()) {
+                case 4:
+                    level = 0;
+                    break;
+                case 6:
+                    level = 1;
+                    break;
+                case 8:
+                    level = 2;
+                    break;
+            }
+            try {
+                score.save(getBounces(), playerTF.getText(), level, date);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    public void startGame() {
+        levelLabel.setVisible(false);
+        levelCB.setVisible(false);
         startButton.setVisible(false);
 
         Threads threads = new Threads(this);
         threads.start();
-        int positionFixer = 0;
-        for (int i = 0; i < 5; i++) {
-            PacMan pacMan = new PacMan(20, true, mainBox.getWidth() / 2 - 100 +
-                    positionFixer, mainBox.getHeight() / 2 - 60 + positionFixer);
-            pacManArray.add(pacMan);
-            pacManArray.get(i).getArc().setLayoutX(mainBox.getWidth() / 2 - 100 + positionFixer);
-            pacManArray.get(i).getArc().setLayoutY(mainBox.getHeight() / 2 - 100 + positionFixer);
-            positionFixer += 50;
-            pane.getChildren().add(pacManArray.get(i).getArc());
+        switch (levelCB.getValue().toString()) {
+            case "Level 0":
+                int pacManNumber = 4;
+                for (int i = 0; i < pacManNumber; i++) {
+                    PacMan pacMan = new PacMan(20, true, mainBox.getWidth() / 2 - 200 +
+                            (float) 400 / pacManNumber * i, mainBox.getHeight() / 2 - 120 + (float) 240 / pacManNumber * i);
+                    pacManArray.add(pacMan);
+                    pacManArray.get(i).getArc().setLayoutX(pacManArray.get(i).getxOffset());
+                    pacManArray.get(i).getArc().setLayoutY(pacManArray.get(i).getyOffset());
+                    pane.getChildren().add(pacManArray.get(i).getArc());
+                }
+
+                break;
+            case "Level 1":
+                pacManNumber = 6;
+                for (int i = 0; i < pacManNumber; i++) {
+                    PacMan pacMan = new PacMan(20, true, mainBox.getWidth() / 2 - 200 +
+                            (float) 400 / pacManNumber * i, mainBox.getHeight() / 2 - 120 + (float) 240 / pacManNumber * i);
+                    pacManArray.add(pacMan);
+                    pacManArray.get(i).getArc().setLayoutX(pacManArray.get(i).getxOffset());
+                    pacManArray.get(i).getArc().setLayoutY(pacManArray.get(i).getyOffset());
+                    pane.getChildren().add(pacManArray.get(i).getArc());
+                }
+
+                break;
+            case "Level 2":
+                pacManNumber = 8;
+                for (int i = 0; i < pacManNumber; i++) {
+                    PacMan pacMan = new PacMan(20, true, mainBox.getWidth() / 2 - 200 +
+                            (float) 400 / pacManNumber * i, mainBox.getHeight() / 2 - 120 + (float) 240 / pacManNumber * i);
+                    pacManArray.add(pacMan);
+                    pacManArray.get(i).getArc().setLayoutX(pacManArray.get(i).getxOffset());
+                    pacManArray.get(i).getArc().setLayoutY(pacManArray.get(i).getyOffset());
+                    pane.getChildren().add(pacManArray.get(i).getArc());
+                }
+                break;
         }
     }
 
     public void moveFig() {
+
         int bounces = Integer.valueOf(bouncesLabel.getText());
-        double radius = 22;
-        int fixedBounces = 0;
+        double radius = 20;
+
+        ArrayList<Integer> tmpArray = new ArrayList<>();
         for (int i = 0; i < pacManArray.size(); i++) {
-            for (int j = 1; j < pacManArray.size(); j++) {
+            for (int j = 0; j < pacManArray.size(); j++) {
+                boolean flag = false;
                 if (i == j) {
                     continue;
                 }
-                if (Math.abs(pacManArray.get(i).getArc().getLayoutX() - pacManArray.get(j).getArc().getLayoutX()) < radius
-                        && Math.abs(pacManArray.get(i).getArc().getLayoutY() - pacManArray.get(j).getArc().getLayoutY()) < radius) {
-                    pacManArray.get(i).collide();
-                    pacManArray.get(j).collide();
-                    fixedBounces++;
+                for (int tmp : tmpArray
+                ) {
+                    if (tmp == i || tmp == j) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    continue;
+                }
+                double distance = Math.sqrt(Math.pow(pacManArray.get(i).getxOffset() - pacManArray.get(j).getxOffset(), 2) +
+                        Math.pow(pacManArray.get(i).getyOffset() - pacManArray.get(j).getyOffset(), 2));
+                if (distance < radius * 2) {
+                    tmpArray.add(i);
+                    tmpArray.add(j);
                 }
             }
         }
-        bounces += fixedBounces / 2;
+        for (int tmp : tmpArray
+        ) {
+            pacManArray.get(tmp).collide();
+        }
+        bounces += tmpArray.size() / 2;
 
         for (PacMan pM : pacManArray) {
             pM.move(mainBox.getWidth(), mainBox.getHeight());
@@ -96,9 +211,5 @@ public class PacManController {
 
     public void setBounces(int bounces) {
         this.bounces = bounces;
-    }
-
-    public void setBouncesLabel(int bounces) {
-        this.bouncesLabel.setText(String.valueOf(bounces));
     }
 }

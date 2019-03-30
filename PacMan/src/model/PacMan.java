@@ -110,8 +110,13 @@ public class PacMan {
     }
 
     public void collide() {
-        xDirection *= -1;
-        yDirection *= -1;
+        this.xDirection *= -1;
+        this.yDirection *= -1;
+    }
+
+    public void catchPacMan() {
+        speed = 0;
+        arc.setFill(Color.rgb(255, 30, 0));
     }
 
     public int getRadius() {

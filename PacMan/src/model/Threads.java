@@ -9,8 +9,9 @@ public class Threads extends Thread {
     public Threads(PacManController controller) {
         this.controller = controller;
     }
-    public void run(){
-        while (true){
+
+    public void run() {
+        while (true) {
             controller.moveFig();
             try {
                 sleep(70);
